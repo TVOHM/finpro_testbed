@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <vector>
+#include <random> //using MT RNG
 using namespace std;
 
 bool Keys[256];
@@ -51,6 +52,21 @@ const char* fragmentShaderProgram =
 	"void main(void)\n"
 	"{\n"
 	"gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);\n"
+	"}\n";
+
+GLuint geometryShader;
+const char* geometryShaderProgram =
+	"#version 150\n"
+	"layout (triangles) in;\n"
+	"layout (triangle_strip, max_vertices = 3) out;\n"
+	"void main(void)\n"
+	"{\n"
+	"	for(int i=0; i<3; i++)\n"
+	"	{\n"
+	"		gl_Position = gl_in[i].gl_Position;\n"
+	"		EmitVertex();\n"
+	"	}\n"
+	"	EndPrimitive();\n"
 	"}\n";
 
 float vertexPositions[] = {
@@ -251,9 +267,20 @@ int main(int argc, char* argv[])
 	else
 		printf("Fragment shader compile OK");
 
+	geometryShader = glCreateShader(GL_GEOMETRY_SHADER);
+	glShaderSource(geometryShader, 1, (const GLchar**)&geometryShaderProgram, NULL);
+	glCompileShader(geometryShader);
+	GLint geometryShaderCompiled = 0;
+	glGetShaderiv(geometryShader, GL_COMPILE_STATUS, &geometryShaderCompiled);
+	if(!geometryShaderCompiled)
+		printf("Geometry shader compile FAILED");
+	else
+		printf("Geometry shader compile OK");
+
 	programObject = glCreateProgram();
 	glAttachShader(programObject, vertexShader);
 	glAttachShader(programObject, fragmentShader);
+	glAttachShader(programObject, geometryShader);
 	glLinkProgram(programObject);
 
 	GLint status;
