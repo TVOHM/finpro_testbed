@@ -1,0 +1,9 @@
+# Locally Generate VS2010 Files #
+#################################
+/Debug/
+/Release/
+/ipch/
+Shader_Testbed.sdf
+Shader_Testbed.opensdf
+/Shader_Testbed/Debug
+/Shader_Testbed/Release
